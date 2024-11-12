@@ -1,6 +1,3 @@
-import scipy as sp
-from scipy import ndimage
-# import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numba
 import numpy as np
@@ -150,9 +147,14 @@ def disorder_averged_hysteresis_cycle_athermal(J: list, f_gf: list, f_sn: int, b
     m_up_s = np.zeros((f_sn, b_N))
     m_down_s = np.zeros((f_sn, b_N))
 
+    Nsites = J.shape[0]
+
     for i in tqdm(range(f_sn)):
-        f = f_gf()
-        m_up, s_up, m_down, s_down = hystersis_cycle_athermal(J, f, b_ax, steps_number)
+        f = f_gf(Nsites)
+
+
+        # m_up, s_up, m_down, s_down
+        m_up, _, m_down, _ = hystersis_cycle_athermal(J, f, b_ax, steps_number)
 
         m_up_s[i] = m_up[:, -1]
         m_down_s[i] = m_down[:, -1]
@@ -161,20 +163,20 @@ def disorder_averged_hysteresis_cycle_athermal(J: list, f_gf: list, f_sn: int, b
 
 # Domain grid
 Nx, Ny = 10, 10
-Nsites = Nx * Ny
+grid_Nsites = Nx * Ny
 
 # Set the exchange energy
-J = np.diag(np.ones(Nx - 1), k=1) + np.diag(np.ones(Nx - 1), k=-1)
-J = np.kron(J, np.eye(Nx)) + np.kron(np.eye(Nx), J)
-#J = np.zeros((Nsites, Nsites))
-#J += np.diag(np.ones(Nsites - 1), k=1) + np.diag(np.ones(Nsites - 1), k=-1)
-#J += np.diag(np.ones(Nsites - Nx), k=Nx) + np.diag(np.ones(Nsites - Nx), k=-Nx)
+J_energy = np.diag(np.ones(Nx - 1), k=1) + np.diag(np.ones(Nx - 1), k=-1)
+J_energy = np.kron(J_energy, np.eye(Nx)) + np.kron(np.eye(Nx), J_energy)
+#J_energy = np.zeros((Nsites, Nsites))
+#J_energy += np.diag(np.ones(Nsites - 1), k=1) + np.diag(np.ones(Nsites - 1), k=-1)
+#J_energy += np.diag(np.ones(Nsites - Nx), k=Nx) + np.diag(np.ones(Nsites - Nx), k=-Nx)
 
 # Temperature
 T = 0
 
 # Generating function of the random field
-def f_gf():
+def f_gf(Nsites: int):
     R = 1.
     return np.random.randn(Nsites) * R
 
@@ -186,8 +188,8 @@ b_ax = np.linspace(-3, 3, b_N)
 # Number of steps per cycle
 steps_number = 4000
 
-f = f_gf()
-m_up, s_up, m_down, s_down = hystersis_cycle_athermal(J, f, b_ax, steps_number)
+f = f_gf(grid_Nsites)
+m_up, s_up, m_down, s_down = hystersis_cycle_athermal(J_energy, f, b_ax, steps_number)
 
 # fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(ncols=2, nrows=2)
 # ax1.imshow(s_up[52].reshape(Nx, Ny), vmin=0, vmax=1)
@@ -196,7 +198,7 @@ m_up, s_up, m_down, s_down = hystersis_cycle_athermal(J, f, b_ax, steps_number)
 # ax4.imshow(s_up[55].reshape(Nx, Ny), vmin=0, vmax=1)
 
 # Check convergence
-plt.plot(range(steps_number), m_up.T);
+plt.plot(range(steps_number), m_up.T)
 
 fig, ax = plt.subplots()
 ax.plot(b_ax, m_up[:, -1], ".-")
@@ -206,7 +208,7 @@ ax.set_ylabel(r"$m/M_s$")
 
 f_sn = 19 # 300  # Number of realization
 m_up_s, m_down_s = disorder_averged_hysteresis_cycle_athermal(
-    J, f_gf, f_sn, b_ax, steps_number
+    J_energy, f_gf, f_sn, b_ax, steps_number
 )
 
 mc_0_pi = 0.7
