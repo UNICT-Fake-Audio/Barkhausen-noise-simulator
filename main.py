@@ -1,9 +1,9 @@
-import matplotlib as mpl
+import scipy as sp
+from scipy import ndimage
+# import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numba
 import numpy as np
-import scipy as sp
-from scipy import ndimage
 from tqdm.notebook import tqdm
 from matplotlib.gridspec import GridSpec
 
@@ -68,7 +68,7 @@ def run_krfism_simulation(J: list, f: list, b: float, temperature: float, s_init
     return m, samples
 
 
-def hystersis_cycle_athermal(J: list, f: list, b_ax: list, steps_number: int):
+def hystersis_cycle_athermal(J: list, f: list, b_ax: list, steps_number: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Simulate random field Ising model on an hysteresis cycle at zero temperature.
 
@@ -107,7 +107,7 @@ def hystersis_cycle_athermal(J: list, f: list, b_ax: list, steps_number: int):
     for b_idx in range(b_N):
         b = b_ax[b_idx]
         m_up[b_idx], s_up[b_idx] = run_krfism_simulation(
-            J, f, b, T=0, s_init=s_init, steps_number=steps_number, save_samples=False
+            J, f, b, temperature=0, s_init=s_init, steps_number=steps_number, save_samples=False
         )
         s_init = s_up[b_idx]
 
@@ -116,7 +116,7 @@ def hystersis_cycle_athermal(J: list, f: list, b_ax: list, steps_number: int):
     for b_idx in range(b_N - 1, -1, -1):
         b = b_ax[b_idx]
         m_down[b_idx], s_down[b_idx] = run_krfism_simulation(
-            J, f, b, T=0, s_init=s_init, steps_number=steps_number, save_samples=False
+            J, f, b, temperature=0, s_init=s_init, steps_number=steps_number, save_samples=False
         )
         s_init = s_down[b_idx]
 
