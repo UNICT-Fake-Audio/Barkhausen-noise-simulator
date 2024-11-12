@@ -10,7 +10,7 @@ from matplotlib.gridspec import GridSpec
 np.random.seed(0)
 
 @numba.jit(nopython=True, cache=True)
-def run_krfism_simulation(J: list, f: list, b: float, temperature: float, s_init, steps_number: int, save_samples=False):
+def run_krfism_simulation(J: list, f: list, b: float, temperature: float, s_init, steps_number: int, save_samples=False) -> tuple[np.ndarray, np.ndarray]:
     """
     Run kinetic random field Ising model with Glauber dynamics.
 
@@ -123,7 +123,7 @@ def hystersis_cycle_athermal(J: list, f: list, b_ax: list, steps_number: int) ->
     return m_up, s_up, m_down, s_down
 
 
-def disorder_averged_hysteresis_cycle_athermal(J: list, f_gf: list, f_sn: int, b_ax: list, steps_number: int):
+def disorder_averged_hysteresis_cycle_athermal(J: list, f_gf: list, f_sn: int, b_ax: list, steps_number: int) -> tuple[np.ndarray, np.ndarray]:
     """
     Simulate random field Ising model on an hysteresis cycle at zero temperature for many disorder realizations.
 
