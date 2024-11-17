@@ -3,6 +3,7 @@ import numba
 import numpy as np
 from tqdm.notebook import tqdm
 from matplotlib.gridspec import GridSpec
+import sys
 
 np.random.seed(0)
 
@@ -161,8 +162,29 @@ def disorder_averged_hysteresis_cycle_athermal(J: list, f_gf: list, f_sn: int, b
 
     return m_up_s, m_down_s
 
+def gen_green_graph(ax_t_inset: plt.Axes) -> None:
+    axins = ax_t_inset.inset_axes((0.8, 0, 0.2, 0.7))
+    axins.plot(b_ax, m_up_mean, ".-", color="C2")
+    axins.plot(b_ax, m_down_mean, ".-", color="C2")
+    axins.set_xlabel(r"$b / J$")
+    axins.set_ylabel(r"$\langle S \rangle$")
+
+    axins.hlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], -3, 3, colors="k")
+
+    axins.text(-3, 1.0, "N")
+    axins.text(-3, 0.8, "$\pi$")
+    axins.text(-3, 0.0, "0")
+    axins.text(-3, -0.8, "$\pi$")
+    axins.text(-3, -1.0, "N")
+
+args = sys.argv
+
+grid_len = 10
+if len(args) > 1:
+    grid_len = int(sys.argv[1])
+
 # Domain grid
-Nx, Ny = 20, 20
+Nx, Ny = grid_len, grid_len
 grid_Nsites = Nx * Ny
 
 # Set the exchange energy
@@ -176,7 +198,7 @@ J_energy = np.kron(J_energy, np.eye(Nx)) + np.kron(np.eye(Nx), J_energy)
 T = 0
 
 # Generating function of the random field
-def f_gf(Nsites: int):
+def f_gf(Nsites: int) -> float:
     R = 1.
     return np.random.randn(Nsites) * R
 
@@ -201,10 +223,10 @@ m_up, s_up, m_down, s_down = hystersis_cycle_athermal(J_energy, f, b_ax, steps_n
 plt.plot(range(steps_number), m_up.T)
 
 fig, ax = plt.subplots()
-ax.plot(b_ax, m_up[:, -1], ".-")
-ax.plot(b_ax, m_down[:, -1], ".-")
-ax.set_xlabel(r"$b/J$")
-ax.set_ylabel(r"$m/M_s$")
+# ax.plot(b_ax, m_up[:, -1], ".-")
+# ax.plot(b_ax, m_down[:, -1], ".-")
+# ax.set_xlabel(r"$b/J$")
+# ax.set_ylabel(r"$m/M_s$")
 
 f_sn = 19 # 300  # Number of realization
 m_up_s, m_down_s = disorder_averged_hysteresis_cycle_athermal(
@@ -250,10 +272,11 @@ ax_b2 = fig.add_subplot(gs[2, 2:])
 
 # We show only 20 curves, otherwise it gets too crowded
 for i in range(19):
+    # blue curves
     ax_t.plot(b_ax, m_up_s[i, :], ".-", color="C0", alpha=0.5)
     ax_t.plot(b_ax, m_down_s[i, :], ".-", color="C0", alpha=0.5)
 
-# Orange curve
+    # Orange curve
     ax_t.plot(b_ax, m_up_s[-1, :], ".-", color='C1')
     ax_t.plot(b_ax, m_down_s[-1, :], ".-", color='C1')
 
@@ -262,77 +285,64 @@ ax_t.set_ylabel(r"$\langle S \rangle $")
 
 ax_t.hlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], -3, 3, colors="k")
 
-ax_t.text(-3, 1.0, "N")
-ax_t.text(-3, 0.8, "$\pi$")
-ax_t.text(-3, 0.0, "0")
-ax_t.text(-3, -0.8, "$\pi$")
-ax_t.text(-3, -1.0, "N")
+# ax_t.text(-3, 1.0, "N")
+# ax_t.text(-3, 0.8, "$\pi$")
+# ax_t.text(-3, 0.0, "0")
+# ax_t.text(-3, -0.8, "$\pi$")
+# ax_t.text(-3, -1.0, "N")
 
 
 ax_t.scatter(b_ax[middle_plots_idx], m_up[:, -1][middle_plots_idx], color='C3', zorder=20)
 
 #### INSET
-
-axins = ax_t.inset_axes((0.8, 0, 0.2, 0.7))
-axins.plot(b_ax, m_up_mean, ".-", color="C2")
-axins.plot(b_ax, m_down_mean, ".-", color="C2")
-axins.set_xlabel(r"$b / J$")
-axins.set_ylabel(r"$\langle S \rangle$")
-
-axins.hlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], -3, 3, colors="k")
-
-axins.text(-3, 1.0, "N")
-axins.text(-3, 0.8, "$\pi$")
-axins.text(-3, 0.0, "0")
-axins.text(-3, -0.8, "$\pi$")
-axins.text(-3, -1.0, "N")
+# gen_green_graph(ax_t)
 
 ##### MIDDLE
 
-ax_m1.imshow(s_up[middle_plots_idx[0]-1].reshape(Nx, Ny), vmin=0, vmax=1)
-ax_m2.imshow(s_up[middle_plots_idx[1]-1].reshape(Nx, Ny), vmin=0, vmax=1)
-ax_m3.imshow(s_up[middle_plots_idx[2]-1].reshape(Nx, Ny), vmin=0, vmax=1)
-ax_m4.imshow(s_up[middle_plots_idx[3]-1].reshape(Nx, Ny), vmin=0, vmax=1)
+# ax_m1.imshow(s_up[middle_plots_idx[0]-1].reshape(Nx, Ny), vmin=0, vmax=1)
+# ax_m2.imshow(s_up[middle_plots_idx[1]-1].reshape(Nx, Ny), vmin=0, vmax=1)
+# ax_m3.imshow(s_up[middle_plots_idx[2]-1].reshape(Nx, Ny), vmin=0, vmax=1)
+# ax_m4.imshow(s_up[middle_plots_idx[3]-1].reshape(Nx, Ny), vmin=0, vmax=1)
 
-ax_m1.set_xticks(np.arange(10)-0.5, labels=[])
-ax_m2.set_xticks(np.arange(10)-0.5, labels=[])
-ax_m3.set_xticks(np.arange(10)-0.5, labels=[])
-ax_m4.set_xticks(np.arange(10)-0.5, labels=[])
+# ax_m1.set_xticks(np.arange(10)-0.5, labels=[])
+# ax_m2.set_xticks(np.arange(10)-0.5, labels=[])
+# ax_m3.set_xticks(np.arange(10)-0.5, labels=[])
+# ax_m4.set_xticks(np.arange(10)-0.5, labels=[])
 
-ax_m1.set_yticks(np.arange(10)-0.5, labels=[])
-ax_m2.set_yticks(np.arange(10)-0.5, labels=[])
-ax_m3.set_yticks(np.arange(10)-0.5, labels=[])
-ax_m4.set_yticks(np.arange(10)-0.5, labels=[])
+# ax_m1.set_yticks(np.arange(10)-0.5, labels=[])
+# ax_m2.set_yticks(np.arange(10)-0.5, labels=[])
+# ax_m3.set_yticks(np.arange(10)-0.5, labels=[])
+# ax_m4.set_yticks(np.arange(10)-0.5, labels=[])
 
-ax_m1.grid(visible=True, which='major', axis='both')
-ax_m2.grid(visible=True, which='major', axis='both')
-ax_m3.grid(visible=True, which='major', axis='both')
-ax_m4.grid(visible=True, which='major', axis='both')
+# ax_m1.grid(visible=True, which='major', axis='both')
+# ax_m2.grid(visible=True, which='major', axis='both')
+# ax_m3.grid(visible=True, which='major', axis='both')
+# ax_m4.grid(visible=True, which='major', axis='both')
 
 ##### BOTTOM
 
-# bins = [-1.1, -mc_pi_N, -mc_0_pi, mc_0_pi, mc_pi_N, 1.1]
-bins = 30
+# # bins = [-1.1, -mc_pi_N, -mc_0_pi, mc_0_pi, mc_pi_N, 1.1]
+# bins = 30
 
-ax_b1.bar(m_up_hist[1][:-1], m_up_hist[0], width=0.1, align='edge', color = bar_colors)
-ax_b1.vlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], 0, 3, colors="k")
+# ax_b1.bar(m_up_hist[1][:-1], m_up_hist[0], width=0.1, align='edge', color = bar_colors)
+# ax_b1.vlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], 0, 3, colors="k")
 
-ax_b1.text(1.0, 1, "N")
-ax_b1.text(0.8, 1, "$\pi$")
-ax_b1.text(0.0, 1, "0")
-ax_b1.text(-0.8, 1, "$\pi$")
-ax_b1.text(-1.0, 1, "N")
-ax_b1.set_xlabel("$m$")
+# ax_b1.text(1.0, 1, "N")
+# ax_b1.text(0.8, 1, "$\pi$")
+# ax_b1.text(0.0, 1, "0")
+# ax_b1.text(-0.8, 1, "$\pi$")
+# ax_b1.text(-1.0, 1, "N")
+# ax_b1.set_xlabel("$m$")
 
-ax_b2.bar(m_down_hist[1][:-1], m_down_hist[0], width=0.1, align='edge', color = bar_colors)
-ax_b2.vlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], 0, 3, colors="k")
+# ax_b2.bar(m_down_hist[1][:-1], m_down_hist[0], width=0.1, align='edge', color = bar_colors)
+# ax_b2.vlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], 0, 3, colors="k")
 
-ax_b2.text(1.0, 1, "N")
-ax_b2.text(0.8, 1, "$\pi$")
-ax_b2.text(0.0, 1, "0")
-ax_b2.text(-0.8, 1, "$\pi$")
-ax_b2.text(-1.0, 1, "N")
-ax_b2.set_xlabel("$m$")
+# ax_b2.text(1.0, 1, "N")
+# ax_b2.text(0.8, 1, "$\pi$")
+# ax_b2.text(0.0, 1, "0")
+# ax_b2.text(-0.8, 1, "$\pi$")
+# ax_b2.text(-1.0, 1, "N")
+# ax_b2.set_xlabel("$m$")
 
 gs.tight_layout(fig)
 
