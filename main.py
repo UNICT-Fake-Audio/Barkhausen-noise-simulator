@@ -5,6 +5,8 @@ from tqdm.notebook import tqdm
 from matplotlib.gridspec import GridSpec
 import sys
 
+from convert import convert_into_audio
+
 np.random.seed(0)
 
 @numba.jit(nopython=True, cache=True)
@@ -153,7 +155,6 @@ def disorder_averged_hysteresis_cycle_athermal(J: list, f_gf: list, f_sn: int, b
     for i in tqdm(range(f_sn)):
         f = f_gf(Nsites)
 
-
         # m_up, s_up, m_down, s_down
         m_up, _, m_down, _ = hystersis_cycle_athermal(J, f, b_ax, steps_number)
 
@@ -161,21 +162,6 @@ def disorder_averged_hysteresis_cycle_athermal(J: list, f_gf: list, f_sn: int, b
         m_down_s[i] = m_down[:, -1]
 
     return m_up_s, m_down_s
-
-def gen_green_graph(ax_t_inset: plt.Axes) -> None:
-    axins = ax_t_inset.inset_axes((0.8, 0, 0.2, 0.7))
-    axins.plot(b_ax, m_up_mean, ".-", color="C2")
-    axins.plot(b_ax, m_down_mean, ".-", color="C2")
-    axins.set_xlabel(r"$b / J$")
-    axins.set_ylabel(r"$\langle S \rangle$")
-
-    axins.hlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], -3, 3, colors="k")
-
-    axins.text(-3, 1.0, "N")
-    axins.text(-3, 0.8, "$\pi$")
-    axins.text(-3, 0.0, "0")
-    axins.text(-3, -0.8, "$\pi$")
-    axins.text(-3, -1.0, "N")
 
 args = sys.argv
 
@@ -190,9 +176,9 @@ grid_Nsites = Nx * Ny
 # Set the exchange energy
 J_energy = np.diag(np.ones(Nx - 1), k=1) + np.diag(np.ones(Nx - 1), k=-1)
 J_energy = np.kron(J_energy, np.eye(Nx)) + np.kron(np.eye(Nx), J_energy)
-#J_energy = np.zeros((Nsites, Nsites))
-#J_energy += np.diag(np.ones(Nsites - 1), k=1) + np.diag(np.ones(Nsites - 1), k=-1)
-#J_energy += np.diag(np.ones(Nsites - Nx), k=Nx) + np.diag(np.ones(Nsites - Nx), k=-Nx)
+# J_energy = np.zeros((Nsites, Nsites))
+# J_energy += np.diag(np.ones(Nsites - 1), k=1) + np.diag(np.ones(Nsites - 1), k=-1)
+# J_energy += np.diag(np.ones(Nsites - Nx), k=Nx) + np.diag(np.ones(Nsites - Nx), k=-Nx)
 
 # Temperature
 T = 0
@@ -265,59 +251,84 @@ ax_m2 = fig.add_subplot(gs[1, 1])
 ax_m3 = fig.add_subplot(gs[1, 2])
 ax_m4 = fig.add_subplot(gs[1, 3])
 
-ax_b1 = fig.add_subplot(gs[2, :2])
-ax_b2 = fig.add_subplot(gs[2, 2:])
+# ax_b1 = fig.add_subplot(gs[2, :2])
+# ax_b2 = fig.add_subplot(gs[2, 2:])
+
 
 ##### TOP
-
-# We show only 20 curves, otherwise it gets too crowded
-for i in range(19):
-    # blue curves
-    ax_t.plot(b_ax, m_up_s[i, :], ".-", color="C0", alpha=0.5)
-    ax_t.plot(b_ax, m_down_s[i, :], ".-", color="C0", alpha=0.5)
+def generate_top() -> None:
+    # We show only 20 curves, otherwise it gets too crowded
+    for i in range(19):
+        # blue curves
+        ax_t.plot(b_ax, m_up_s[i, :], ".-", color="C0", alpha=0.5)
+        ax_t.plot(b_ax, m_down_s[i, :], ".-", color="C0", alpha=0.5)
 
     # Orange curve
-    ax_t.plot(b_ax, m_up_s[-1, :], ".-", color='C1')
-    ax_t.plot(b_ax, m_down_s[-1, :], ".-", color='C1')
+    ax_t.plot(b_ax, m_up_s[-1, :], ".-", color="orange")
+    ax_t.plot(b_ax, m_down_s[-1, :], ".-", color="orange")
 
-ax_t.set_xlabel(r"$b / J$")
-ax_t.set_ylabel(r"$\langle S \rangle $")
+    # jump points
+    orange_points_up = m_up_s[-1, :]
+    orange_points__down = m_up_s[-1, :]
 
-ax_t.hlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], -3, 3, colors="k")
+    print("orange_points_up", orange_points_up)
+    print(len(orange_points_up))
+    # print(orange_points__down)
 
-# ax_t.text(-3, 1.0, "N")
-# ax_t.text(-3, 0.8, "$\pi$")
-# ax_t.text(-3, 0.0, "0")
-# ax_t.text(-3, -0.8, "$\pi$")
-# ax_t.text(-3, -1.0, "N")
+    print("np.diff(orange_points_up)", np.diff(orange_points_up))
+    # print(np.diff(orange_points__down))
+
+    convert_into_audio(np.diff(orange_points_up), "output.wav")
+
+    ax_t.set_xlabel(r"$b / J$")
+    ax_t.set_ylabel(r"$\langle S \rangle $")
+
+    ax_t.hlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], -3, 3, colors="k")
+
+    # ax_t.text(-3, 1.0, "N")
+    # ax_t.text(-3, 0.8, "$\pi$")
+    # ax_t.text(-3, 0.0, "0")
+    # ax_t.text(-3, -0.8, "$\pi$")
+    # ax_t.text(-3, -1.0, "N")
+
+    ax_t.scatter(
+        b_ax[middle_plots_idx], m_up[:, -1][middle_plots_idx], color="C3", zorder=20
+    )
 
 
-ax_t.scatter(b_ax[middle_plots_idx], m_up[:, -1][middle_plots_idx], color='C3', zorder=20)
+generate_top()
+
 
 #### INSET
+def gen_green_graph(ax_t_inset: plt.Axes) -> None:
+    axins = ax_t_inset.inset_axes((0.8, 0, 0.2, 0.7))
+    axins.plot(b_ax, m_up_mean, ".-", color="C2")
+    axins.plot(b_ax, m_down_mean, ".-", color="C2")
+    axins.set_xlabel(r"$b / J$")
+    axins.set_ylabel(r"$\langle S \rangle$")
+
+    axins.hlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], -3, 3, colors="k")
+
+    axins.text(-3, 1.0, "N")
+    axins.text(-3, 0.8, "$\pi$")
+    axins.text(-3, 0.0, "0")
+    axins.text(-3, -0.8, "$\pi$")
+    axins.text(-3, -1.0, "N")
+
+
 # gen_green_graph(ax_t)
 
 ##### MIDDLE
 
-# ax_m1.imshow(s_up[middle_plots_idx[0]-1].reshape(Nx, Ny), vmin=0, vmax=1)
-# ax_m2.imshow(s_up[middle_plots_idx[1]-1].reshape(Nx, Ny), vmin=0, vmax=1)
-# ax_m3.imshow(s_up[middle_plots_idx[2]-1].reshape(Nx, Ny), vmin=0, vmax=1)
-# ax_m4.imshow(s_up[middle_plots_idx[3]-1].reshape(Nx, Ny), vmin=0, vmax=1)
+ax_m1.imshow(s_up[middle_plots_idx[0] - 1].reshape(Nx, Ny), vmin=0, vmax=1)
+ax_m2.imshow(s_up[middle_plots_idx[1] - 1].reshape(Nx, Ny), vmin=0, vmax=1)
+ax_m3.imshow(s_up[middle_plots_idx[2] - 1].reshape(Nx, Ny), vmin=0, vmax=1)
+ax_m4.imshow(s_up[middle_plots_idx[3] - 1].reshape(Nx, Ny), vmin=0, vmax=1)
 
-# ax_m1.set_xticks(np.arange(10)-0.5, labels=[])
-# ax_m2.set_xticks(np.arange(10)-0.5, labels=[])
-# ax_m3.set_xticks(np.arange(10)-0.5, labels=[])
-# ax_m4.set_xticks(np.arange(10)-0.5, labels=[])
-
-# ax_m1.set_yticks(np.arange(10)-0.5, labels=[])
-# ax_m2.set_yticks(np.arange(10)-0.5, labels=[])
-# ax_m3.set_yticks(np.arange(10)-0.5, labels=[])
-# ax_m4.set_yticks(np.arange(10)-0.5, labels=[])
-
-# ax_m1.grid(visible=True, which='major', axis='both')
-# ax_m2.grid(visible=True, which='major', axis='both')
-# ax_m3.grid(visible=True, which='major', axis='both')
-# ax_m4.grid(visible=True, which='major', axis='both')
+for graph in [ax_m1, ax_m2, ax_m3, ax_m4]:
+    graph.set_xticks(np.arange(10) - 0.5, labels=[])
+    graph.set_yticks(np.arange(10) - 0.5, labels=[])
+    graph.grid(visible=True, which="major", axis="both")
 
 ##### BOTTOM
 
@@ -346,113 +357,7 @@ ax_t.scatter(b_ax[middle_plots_idx], m_up[:, -1][middle_plots_idx], color='C3', 
 
 gs.tight_layout(fig)
 
-plt.savefig(f'ising_figure_{Nx}_{Ny}.pdf')
-
-# fig = plt.figure( figsize = (10, 10))
-
-# gs = GridSpec(3, 4, width_ratios=[1, 1, 1, 1], height_ratios=[2, 1, 2])
-
-# ax_t = fig.add_subplot(gs[0, :])
-
-# ax_m1 = fig.add_subplot(gs[1, 0])
-# ax_m2 = fig.add_subplot(gs[1, 1])
-# ax_m3 = fig.add_subplot(gs[1, 2])
-# ax_m4 = fig.add_subplot(gs[1, 3])
-
-# ax_b1 = fig.add_subplot(gs[2, :2])
-# ax_b2 = fig.add_subplot(gs[2, 2:])
-
-# ##### TOP
-
-# # We show only 20 curves, otherwise it gets too crowded
-# for i in range(19):
-#     ax_t.plot(b_ax, m_up_s[i, :], ".-", color="C0", alpha=0.5)
-#     ax_t.plot(b_ax, m_down_s[i, :], ".-", color="C0", alpha=0.5)
-
-# # Orange curve
-#     ax_t.plot(b_ax, m_up_s[-1, :], ".-", color='C1')
-#     ax_t.plot(b_ax, m_down_s[-1, :], ".-", color='C1')
-
-# ax_t.set_xlabel(r"$b / J$")
-# ax_t.set_ylabel(r"$\langle S \rangle $")
-
-# ax_t.hlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], -3, 3, colors="k")
-
-# ax_t.text(-3, 1.0, "N")
-# ax_t.text(-3, 0.8, "$\pi$")
-# ax_t.text(-3, 0.0, "0")
-# ax_t.text(-3, -0.8, "$\pi$")
-# ax_t.text(-3, -1.0, "N")
-
-
-# ax_t.scatter(b_ax[middle_plots_idx], m_up[:, -1][middle_plots_idx], color='C3', zorder=20)
-
-# #### INSET
-
-# axins = ax_t.inset_axes((0.8, 0, 0.2, 0.7))
-# axins.plot(b_ax, m_up_mean, ".-", color="C3")
-# axins.plot(b_ax, m_down_mean, ".-", color="k")
-# axins.set_xlabel(r"$b / J$")
-# axins.set_ylabel(r"$\langle S \rangle$")
-
-# axins.hlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], -3, 3, colors="k")
-
-# axins.text(-3, 1.0, "N")
-# axins.text(-3, 0.8, "$\pi$")
-# axins.text(-3, 0.0, "0")
-# axins.text(-3, -0.8, "$\pi$")
-# axins.text(-3, -1.0, "N")
-
-# ##### MIDDLE
-
-# ax_m1.imshow(s_up[middle_plots_idx[0]-1].reshape(Nx, Ny), vmin=0, vmax=1)
-# ax_m2.imshow(s_up[middle_plots_idx[1]-1].reshape(Nx, Ny), vmin=0, vmax=1)
-# ax_m3.imshow(s_up[middle_plots_idx[2]-1].reshape(Nx, Ny), vmin=0, vmax=1)
-# ax_m4.imshow(s_up[middle_plots_idx[3]-1].reshape(Nx, Ny), vmin=0, vmax=1)
-
-# ax_m1.set_xticks(np.arange(10)-0.5, labels=[])
-# ax_m2.set_xticks(np.arange(10)-0.5, labels=[])
-# ax_m3.set_xticks(np.arange(10)-0.5, labels=[])
-# ax_m4.set_xticks(np.arange(10)-0.5, labels=[])
-
-# ax_m1.set_yticks(np.arange(10)-0.5, labels=[])
-# ax_m2.set_yticks(np.arange(10)-0.5, labels=[])
-# ax_m3.set_yticks(np.arange(10)-0.5, labels=[])
-# ax_m4.set_yticks(np.arange(10)-0.5, labels=[])
-
-# ax_m1.grid(visible=True, which='major', axis='both')
-# ax_m2.grid(visible=True, which='major', axis='both')
-# ax_m3.grid(visible=True, which='major', axis='both')
-# ax_m4.grid(visible=True, which='major', axis='both')
-
-# ##### BOTTOM
-
-# # bins = [-1.1, -mc_pi_N, -mc_0_pi, mc_0_pi, mc_pi_N, 1.1]
-# bins = 30
-
-# ax_b1.bar(m_up_hist[1][:-1], m_up_hist[0], width=0.1, align='edge', color = bar_colors)
-# ax_b1.vlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], 0, 3, colors="k")
-
-# ax_b1.text(1.0, 1, "N")
-# ax_b1.text(0.8, 1, "$\pi$")
-# ax_b1.text(0.0, 1, "0")
-# ax_b1.text(-0.8, 1, "$\pi$")
-# ax_b1.text(-1.0, 1, "N")
-# ax_b1.set_xlabel("$m$")
-
-# ax_b2.bar(m_down_hist[1][:-1], m_down_hist[0], width=0.1, align='edge', color = bar_colors)
-# ax_b2.vlines([mc_pi_N, mc_0_pi, -mc_0_pi, -mc_pi_N], 0, 3, colors="k")
-
-# ax_b2.text(1.0, 1, "N")
-# ax_b2.text(0.8, 1, "$\pi$")
-# ax_b2.text(0.0, 1, "0")
-# ax_b2.text(-0.8, 1, "$\pi$")
-# ax_b2.text(-1.0, 1, "N")
-# ax_b2.set_xlabel("$m$")
-
-# gs.tight_layout(fig)
-
-# plt.savefig(f'ising_figure_{Nx}_{Ny}.pdf')
+plt.savefig(f"ising_figure_{Nx}_{Ny}.pdf")
 
 # bins=20
 # hist=np.histogram([-1,1,-1,1,0.9,0.89,0.91], density = True, bins=bins)
