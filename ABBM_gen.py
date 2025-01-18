@@ -2,19 +2,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io.wavfile import write
 
-for idx in range(300):
+for idx in range(1000):
     np.random.seed(idx)
 
     # Parameters
+    H_step = 1.0  # Step in the external driving field
+    m0 = 0.0  # Initial displacement
+    dx = 0.00001  # Sampling step for the spatial range
+
+    # model parameters
     Gamma = 1.0  # Damping coefficient
     k = 1.0  # Spring constant (restoring force strength)
-    H_step = 1.0  # Step in the external driving field
+    D = 0.1  # Amplitude of the noise
+
+    # time/length
+    L = 10.0  # Length of the spatial range for W(m)
     dt = 0.001  # Time step
     T = 30.0  # Total simulation time
-    m0 = 0.0  # Initial displacement
-    D = 0.1  # Amplitude of the noise
-    L = 10.0  # Length of the spatial range for W(m)
-    dx = 0.00001  # Sampling step for the spatial range
 
     # Spatial range for W(m)
     x = np.arange(-L / 2, L / 2, dx)
@@ -84,7 +88,7 @@ for idx in range(300):
     # Save to audio file (wav)
     MAX_INT_16_VALUE = 32767
     write(
-        f"data/default_values/{idx}.wav",
+        f"data/samples/{idx+1}.wav",
         sample_rate,
         (samples * MAX_INT_16_VALUE).astype(np.int16),
     )
