@@ -1,0 +1,3 @@
+[submodule "extract-features/fake-audio-detector"]
+	path = extract-features/fake-audio-detector
+	url = https://github.com/UNICT-Fake-Audio/fake-audio-detector/

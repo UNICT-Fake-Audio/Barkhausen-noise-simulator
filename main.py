@@ -357,7 +357,7 @@ for graph in [ax_m1, ax_m2, ax_m3, ax_m4]:
 
 gs.tight_layout(fig)
 
-plt.savefig(f"ising_figure_{Nx}_{Ny}.pdf")
+plt.savefig(f"pdf/ising_figure_{Nx}_{Ny}.pdf")
 
 # bins=20
 # hist=np.histogram([-1,1,-1,1,0.9,0.89,0.91], density = True, bins=bins)

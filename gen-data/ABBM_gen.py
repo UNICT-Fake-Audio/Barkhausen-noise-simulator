@@ -1,24 +1,22 @@
+import pathos as pa
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.io.wavfile import write
+from tqdm import tqdm
+from os import path, makedirs
+from parameters import parameters
 
-for idx in range(1000):
+
+def create_dir_if_not_exists(directory: str) -> None:
+    if not path.exists(directory):
+        makedirs(directory)
+
+
+def gen_abbm_audio(idx: int) -> None:
     np.random.seed(idx)
 
-    # Parameters
-    H_step = 1.0  # Step in the external driving field
-    m0 = 0.0  # Initial displacement
-    dx = 0.00001  # Sampling step for the spatial range
-
-    # model parameters
-    Gamma = 1.0  # Damping coefficient
-    k = 1.0  # Spring constant (restoring force strength)
-    D = 0.1  # Amplitude of the noise
-
-    # time/length
-    L = 10.0  # Length of the spatial range for W(m)
-    dt = 0.001  # Time step
-    T = 30.0  # Total simulation time
+    H_step, m0, dx = parameters["H_step"], parameters["m0"], parameters["dx"]
+    Gamma, k, D = parameters["Gamma"], parameters["k"], parameters["D"]
+    L, dt, T = parameters["L"], parameters["dt"], parameters["T"]
 
     # Spatial range for W(m)
     x = np.arange(-L / 2, L / 2, dx)
@@ -54,20 +52,6 @@ for idx in range(1000):
     velocity = np.diff(m) / dt
     start_from = int(len(time) / 4)
 
-    # plt.figure(figsize=(10, 6))
-    # plt.plot(
-    #     time[start_from:-1],
-    #     velocity[start_from:],
-    #     label="Velocity $\\frac{dm}{dt}$",
-    #     color="blue",
-    # )
-    # plt.xlabel("Time")
-    # plt.ylabel("Velocity $\\frac{dm}{dt}$")
-    # plt.title("Velocity of Domain Wall Displacement from T/4")
-    # plt.legend()
-    # plt.grid()
-    # plt.show()
-
     time = time[start_from:-1]
     velocity = velocity[start_from:]
 
@@ -93,10 +77,14 @@ for idx in range(1000):
         (samples * MAX_INT_16_VALUE).astype(np.int16),
     )
 
-    # # Plot velocity over time
-    # plt.plot(time, velocity)
-    # plt.title("Velocity vs Time")
-    # plt.xlabel("Time (s)")
-    # plt.ylabel("Velocity")
-    # plt.grid(True)
-    # plt.show()
+
+create_dir_if_not_exists("data/samples")
+
+NUM_SAMPLES = int(parameters["NUM_SAMPLES"])
+
+# for index in tqdm(range(NUM_SAMPLES)):
+#     gen_abbm_audio(index)
+
+ncpu = parameters["ncpu"]
+with pa.multiprocessing.ProcessingPool(ncpu) as p:
+    res = list(tqdm(p.imap(gen_abbm_audio, range(NUM_SAMPLES)), total=NUM_SAMPLES))

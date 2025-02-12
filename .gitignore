@@ -165,4 +165,9 @@ cython_debug/
 # custom
 *.pdf
 *.wav
-data/
+gen-data/data/
+pdf/
+**/.DS_Store
+**/.ipynb_checkpoints
+**/.vscode
+**/.csv
