@@ -1,0 +1,5 @@
+scikit-learn==1.0.1
+numpy==1.22.4
+pandas==1.3.4
+matplotlib==3.5.2
+shap @ git+https://github.com/helias/shap.git@06ebfdd29b28191a1faac992c9b5c246b2d70a54
