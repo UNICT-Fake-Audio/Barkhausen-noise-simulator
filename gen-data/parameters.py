@@ -1,5 +1,5 @@
 parameters = {
-    "NUM_SAMPLES": 10000,
+    "NUM_SAMPLES": 5000,
     "ncpu": 8,
     "H_step": 1.0,  # Step in the external driving field
     "m0": 0.0,  # Initial displacement
