@@ -19,7 +19,7 @@ Confusion matrix:
 
 ![HGBC confusion matrix](images/HGBC_cm_barkhausen.svg)
 
-SHAP values:
+HGBC SHAP values:
 
 ![HGBC SHAP values](images/HGBC_SHAP_Barkhausen.svg)
 
@@ -37,17 +37,17 @@ SHAP values:
 
 ![plp graph](images/plp.svg)
 
-### [Spectral_rolloff](https://unict-fake-audio.github.io/audio-datasets-overview/#/datasets?feature=spectral_rolloff&system_id=A01_A06&speaker=LA_0069&feature_per_speaker=0&dataType=0&dataset=BARKHAUSEN&algorithm=false)
+<!-- ### [Spectrum](https://unict-fake-audio.github.io/audio-datasets-overview/#/datasets?feature=spectrum&system_id=A01_A06&speaker=LA_0069&feature_per_speaker=0&dataType=0&dataset=BARKHAUSEN&algorithm=false)
 
-![spectral_rolloff graph](images/spectral_rolloff.svg)
+![Spectrum graph](images/spectrum.svg) -->
 
-### [Spectrum](https://unict-fake-audio.github.io/audio-datasets-overview/#/datasets?feature=spectrum&system_id=A01_A06&speaker=LA_0069&feature_per_speaker=0&dataType=0&dataset=BARKHAUSEN&algorithm=false)
+<!-- ### [Spectral_rolloff](https://unict-fake-audio.github.io/audio-datasets-overview/#/datasets?feature=spectral_rolloff&system_id=A01_A06&speaker=LA_0069&feature_per_speaker=0&dataType=0&dataset=BARKHAUSEN&algorithm=false)
 
-![Spectrum graph](images/spectrum.svg)
+![spectral_rolloff graph](images/spectral_rolloff.svg) -->
 
-### [Energy](https://unict-fake-audio.github.io/audio-datasets-overview/#/datasets?feature=energy&system_id=A01_A06&speaker=LA_0069&feature_per_speaker=0&dataType=0&dataset=BARKHAUSEN&algorithm=false)
+<!-- ### [Energy](https://unict-fake-audio.github.io/audio-datasets-overview/#/datasets?feature=energy&system_id=A01_A06&speaker=LA_0069&feature_per_speaker=0&dataType=0&dataset=BARKHAUSEN&algorithm=false) -->
 
-![Energy graph](images/spectrum.svg)
+<!-- ![Energy graph](images/energy.svg) -->
 
 ## How to run the same experiment
 

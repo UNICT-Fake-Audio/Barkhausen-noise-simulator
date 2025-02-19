@@ -63,13 +63,12 @@ def gen_abbm_audio(idx: int) -> None:
     velocity_normalized = velocity / np.max(np.abs(velocity))
 
     # Audio settings
-    sample_rate = 44100  # Sampling rate (44.1 kHz)
+    sample_rate = 44100
     duration = time[-1]
     samples = np.interp(
         np.linspace(0, duration, int(sample_rate * duration)), time, velocity_normalized
     )
 
-    # Save to audio file (wav)
     MAX_INT_16_VALUE = 32767
     write(
         f"data/samples/{idx+1}.wav",
