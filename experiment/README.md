@@ -15,7 +15,7 @@ Barkhausen 5k samples (default, noise05, gamma10, k10)
 
 best: **HGBC**
 
-Confusion matrix:
+HGBC Confusion matrix:
 
 ![HGBC confusion matrix](images/HGBC_cm_barkhausen.svg)
 
