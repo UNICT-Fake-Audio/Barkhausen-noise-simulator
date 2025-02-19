@@ -7,7 +7,6 @@ We created this repository to organize all Python scripts related to the experim
 - [Generate Dataset](gen-data/README.md)
 - [Extract handcrafted features](extract-features/README.md)
 - [Experiments](experiment/README.md)
-- [Credits](#credits)
 
 <!--
 
