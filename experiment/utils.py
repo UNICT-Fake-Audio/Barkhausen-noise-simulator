@@ -114,6 +114,8 @@ def get_metrics_generators(
             display_labels=display_labels if display_labels else labels,
         )
         disp.plot(cmap=plt.cm.Blues, xticks_rotation="vertical")
+        for labels in disp.text_.ravel():
+            labels.set_fontsize(25)
         plt.show()
 
     return conf_matrix, normalized_conf_matrix, accuracy_per_class, accuracy_overall
