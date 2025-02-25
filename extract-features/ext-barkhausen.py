@@ -32,7 +32,10 @@ for SUB_DIRECTORY in SUB_DIRECTORIES:
         sample_features = get_all_features_from_sample(file_path)
 
         file_name = get_file_name(file_path)
+
+        # hackfix for defining inside the pathos process another dynamic variable which is the sub directory
         sub_dir = get_correct_sub_directory(SUB_DIRECTORIES, file_path)
+
         sample_features = [file_name] + sample_features + [sub_dir]
 
         with open(f"output/{sub_dir}_output_features.csv", "a+", encoding="utf8") as f:
