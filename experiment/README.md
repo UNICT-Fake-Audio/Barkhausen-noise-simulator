@@ -10,7 +10,7 @@ Barkhausen 5k samples (default, noise05, gamma10, k10)
 | RFC   | 99.316             |
 | ETC   | 99.566             |
 | GBC   | 99.6               |
-| HGBC  | 99.783             |
+| HGBC  | 99.75              |
 | ADC   | 96.883             |
 
 best: **HGBC**
